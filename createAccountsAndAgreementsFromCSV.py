@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import csv
+import sys
 import json
 import requests
 import time
@@ -20,9 +21,10 @@ accountImportFile = "C:/Users/tdembowski/Desktop/API Testing/Accounts/KearnyJers
 url_base = "http://ngp-qa-web"
 logFileName = 'C:/Users/tdembowski/Desktop/API Testing/Logs/Test.txt'
 
-def main():
+def main(argv):
 
-    token = authorize('KearnyJC4@mds.mds')
+    email = sys.argv[1]
+    token = authorize(email)
     headers = {'content-type': 'application/json', 'Authorization' : token}
     AccountsURL = 'http://ngp-qa-web:85/api/accounts'
     AgreementsURL = 'http://ngp-qa-web:85/api/serviceAgreements'
@@ -32,6 +34,9 @@ def main():
     createAccountsAndAgreementsfromCSV(accountImportFile, AccountsURL, AgreementsURL, ServicesURL, headers, logFileName)
 
     pass
+
+if __name__ == "__main__":
+    main(sys.argv)
 
 def createAccountsAndAgreementsfromCSV(csvFilePath, AccountsURL, AgreementsURL, ServicesURL, headers, logFileName):
     csvFileReader = csv.DictReader(open(csvFilePath))
