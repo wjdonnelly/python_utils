@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import csv
+import os
 import sys
 import json
 import requests
@@ -17,34 +18,52 @@ import time
 import datetime
 import dateutil.parser
 
-accountImportFile = "C:/Users/tdembowski/Desktop/API Testing/Accounts/KearnyJerseyCity.csv"
-url_base = "http://ngp-qa-web"
-logFileName = 'C:/Users/tdembowski/Desktop/API Testing/Logs/Test.txt'
+accountImportFilePath = "//mds-fs01/pitcrew/api_testing/Accounts/"
+#logFileName = 'C:/Users/tdembowski/Desktop/API Testing/Logs/Test.txt'
+
+#setup the log files
+logPathName = "//mds-fs01/pitcrew/api_testing/Logs/"
+i = datetime.datetime.now()
+dt = i.strftime('%Y%m%d-%H%M%S')
+logFileCalc = 'LoadTest' + "_" + dt + ".tsv"
+logFileName = os.path.join(logPathName, logFileCalc)
 
 def main(argv):
+    try:
+        email = sys.argv[1]
+        accountImportFileName = sys.argv[2]
+        apiBaseURL = sys.argv[3]
+        agreementsPerDay = int(sys.argv[4])
+        sleepTimer = int(sys.argv[5])
+    except:
+        print('Invalid arguments, argument format: ' + '\n\n')
+        print('1) Tenant Administrator Email'+'\n')
+        print('2) Import file name in the //mds-fs01/pitcrew/api_testing/Accounts/ folder '+'\n')
+        print('3) API Base URL, ex: http://ngp-qa-web:85'+'\n')
+        print('4) Number of agreements to enter per day'+'\n')
+        print('5) Wait time between entering agreements in seconds'+'\n\n')
+        print('Full Example: python createAccountsAndAgreements.py loadtest1111a@mds.mds KearnyJerseyCity.csv http://ngp-qa-web:85 20 30'+'\n')
+        sys.exit()
 
-    email = sys.argv[1]
+    accountImportFile = accountImportFilePath + accountImportFileName
     token = authorize(email)
     headers = {'content-type': 'application/json', 'Authorization' : token}
-    AccountsURL = 'http://ngp-qa-web:85/api/accounts'
-    AgreementsURL = 'http://ngp-qa-web:85/api/serviceAgreements'
-    ServicesURL = 'http://ngp-qa-web:85/api/serviceofferings'
+    AccountsURL = apiBaseURL + '/api/accounts'
+    AgreementsURL = apiBaseURL + '/api/serviceAgreements'
+    ServicesURL = apiBaseURL + '/api/serviceofferings'
 
-
-    createAccountsAndAgreementsfromCSV(accountImportFile, AccountsURL, AgreementsURL, ServicesURL, headers, logFileName)
+    createAccountsAndAgreementsfromCSV(accountImportFile, agreementsPerDay, AccountsURL, AgreementsURL, ServicesURL, headers, logFileName, sleepTimer)
 
     pass
 
-if __name__ == "__main__":
-    main(sys.argv)
-
-def createAccountsAndAgreementsfromCSV(csvFilePath, AccountsURL, AgreementsURL, ServicesURL, headers, logFileName):
+def createAccountsAndAgreementsfromCSV(csvFilePath, agreementsPerDay, AccountsURL, AgreementsURL, ServicesURL, headers, logFileName, sleepTimer):
     csvFileReader = csv.DictReader(open(csvFilePath))
     today_date = datetime.date.today()
     initialCommitmentWindowStart = datetime.datetime.now()
     initialCommitmentWindowEnd = datetime.datetime.now()
     initialCommitmentWindowStart_iso = ''
     initialCommitmentWindowEnd_iso = ''
+    countOfAgreements = 0
 
     requestServices = requests.get(ServicesURL, headers=headers)
     services = requestServices.json()
@@ -71,17 +90,10 @@ def createAccountsAndAgreementsfromCSV(csvFilePath, AccountsURL, AgreementsURL, 
 
         accountPayload = json.dumps(post_body_account)
 
-        try:
-            output = callAPIreturningJSON(AccountsURL, headers, accountPayload, logFileName)
-            print output
-        except:
-            print ('Something bad happened psting to the accounts API.')
+        output = callAPIreturningJSON(AccountsURL, headers, accountPayload, logFileName)
 
-        initialCommitmentWindowStart = initialCommitmentWindowStart + datetime.timedelta(0,1800)
-        initialCommitmentWindowEnd = initialCommitmentWindowStart + datetime.timedelta(0,9000)
-
-        initialCommitmentWindowStart_iso = initialCommitmentWindowStart.strftime("%Y-%m-%dT%H:%M:%S")
-        initialCommitmentWindowEnd_iso = initialCommitmentWindowEnd.strftime("%Y-%m-%dT%H:%M:%S")
+        initialCommitmentWindowStart_iso = initialCommitmentWindowStart.strftime("%Y-%m-%dT00:15:00")
+        initialCommitmentWindowEnd_iso = initialCommitmentWindowEnd.strftime("%Y-%m-%dT23:45:00")
 
         todayDateFormatted = today_date.strftime("%Y-%m-%d")
 
@@ -150,15 +162,20 @@ def createAccountsAndAgreementsfromCSV(csvFilePath, AccountsURL, AgreementsURL, 
 
         agreementPayload = json.dumps(post_body_agreement)
 
-        try:
-            output2 = callAPIreturningJSON(AgreementsURL, headers, agreementPayload, logFileName)
-            print output2
-        except:
-            print ('Something bad happened psting to the agreements API.')
+        output2 = callAPIreturningJSON(AgreementsURL, headers, agreementPayload, logFileName)
 
-        initialCommitmentWindowStart = initialCommitmentWindowStart + datetime.timedelta(0,3600)
+        countOfAgreements += 1
 
-        time.sleep(30)
+        if countOfAgreements >= agreementsPerDay:
+            print ("Advancing Day")
+            countOfAgreements = 0
+            initialCommitmentWindowStart = initialCommitmentWindowStart + datetime.timedelta(days=1)
+            initialCommitmentWindowEnd = initialCommitmentWindowEnd + datetime.timedelta(days=1)
+            token = authorize(tenantAdmin)
+            headers = {'content-type': 'application/json', 'Authorization' : token}
+        time.sleep(sleepTimer)
+
+        print ('Count Of Agreements: ' + str(countOfAgreements) + '\n')
 
 
 def authorize(email):
@@ -197,8 +214,9 @@ def callAPIreturningJSON(url, headers, payload, logFileName):
 
     #output the line to the output file
     logFile.write(log_output)
+    print ('Logging API post: ' + log_output)
     return(s);
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    main(sys.argv)
 
