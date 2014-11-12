@@ -19,17 +19,19 @@ import datetime
 import dateutil.parser
 
 accountImportFilePath = "//mds-fs01/pitcrew/api_testing/Accounts/"
+
+#logFileName = 'C:/Users/tdembowski/Desktop/API Testing/Logs/Test.txt'
+
+#setup the log files
 logPathName = "//mds-fs01/pitcrew/api_testing/Logs/"
-tenantAdminEmail = ''
 i = datetime.datetime.now()
 dt = i.strftime('%Y%m%d-%H%M%S')
 logFileCalc = 'LoadTest' + "_" + dt + ".tsv"
 logFileName = os.path.join(logPathName, logFileCalc)
 
 def main(argv):
-    global tenantAdminEmail
     try:
-        tenantAdminEmail = sys.argv[1]
+        email = sys.argv[1]
         accountImportFileName = sys.argv[2]
         apiBaseURL = sys.argv[3]
         agreementsPerDay = int(sys.argv[4])
@@ -45,7 +47,8 @@ def main(argv):
         sys.exit()
 
     accountImportFile = accountImportFilePath + accountImportFileName
-    token = authorize(tenantAdminEmail)
+
+    token = authorize(email)
     headers = {'content-type': 'application/json', 'Authorization' : token}
     AccountsURL = apiBaseURL + '/api/accounts'
     AgreementsURL = apiBaseURL + '/api/serviceAgreements'
@@ -56,7 +59,9 @@ def main(argv):
     pass
 
 def createAccountsAndAgreementsfromCSV(csvFilePath, agreementsPerDay, AccountsURL, AgreementsURL, ServicesURL, headers, logFileName, sleepTimer):
+
     global tenantAdminEmail
+
     csvFileReader = csv.DictReader(open(csvFilePath))
     today_date = datetime.date.today()
     initialCommitmentWindowStart = datetime.datetime.now()
@@ -213,10 +218,8 @@ def callAPIreturningJSON(url, headers, payload, logFileName):
     #sys.stdout.write(output)
 
     #output the line to the output file
-    try:
-        logFile.write(log_output)
-    except:
-        print("Failed to write to log file")
+    logFile.write(log_output)
+
     print ('Logging API post: ' + log_output)
     return(s);
 
