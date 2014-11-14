@@ -20,6 +20,7 @@ import dateutil.parser
 
 class odysseyTenantGenerator:
     sourceFilePath = '//mds-fs01/pitcrew/api_testing/'
+
     def validateTenantsImportFile(self, csvFileName):
         tenantSourceFile = self.sourceFilePath + 'tenants/' + csvFileName
 
@@ -50,6 +51,8 @@ class odysseyTenantGenerator:
                 teamsList = str(row["Teams"])
                 accountsList = str(row["Accounts"])
                 accountswithAgreements = str(row["AccountswithAgreements"])
+                agreementsPerDay = int(row["AgreementsPerDay"])
+                agreementsDelay = int(row["AgreementDelayinSeconds"])
             except:
                 print('Source file incomplete, check all rows against format of template.csv')
                 sys.exit()
@@ -62,39 +65,41 @@ class odysseyTenantGenerator:
                 sys.exit()
 
 
+
+
             if os.path.exists(self.sourceFilePath + 'holidays/' + companyHolidaysFile) == True:
                 print('Company holidays file exists for: ' + companyName)
             else:
                 print('Company holidays file does not exist for: ' + companyName)
-                print('Qutting script')
+                print('Quitting script')
                 sys.exit()
 
             if os.path.exists(self.sourceFilePath + 'territories/' + companyTerritory) == True:
                 print('Company territory file exists for: ' + companyName)
             else:
                 print('Company territory file does not exist for: ' + companyName)
-                print('Qutting script')
+                print('Quitting script')
                 sys.exit()
 
             if os.path.exists(self.sourceFilePath + 'employees/' + employeesList) == True:
                 print('Company employee file exists for: ' + companyName)
             else:
                 print('Company employee file does not exist for: ' + companyName)
-                print('Qutting script')
+                print('Quitting script')
                 sys.exit()
 
             if os.path.exists(self.sourceFilePath + 'services/' + servicesList) == True:
                 print('Company services file exists for: ' + companyName)
             else:
                 print('Company services file does not exist for: ' + companyName)
-                print('Qutting script')
+                print('Quitting script')
                 sys.exit()
 
             if os.path.exists(self.sourceFilePath + 'teams/' + teamsList) == True:
                 print('Company teams file exists for: ' + companyName)
             else:
                 print('Company teams file does not exist for: ' + companyName)
-                print('Qutting script')
+                print('Quitting script')
                 sys.exit()
 
             if accountsList == 'None':
@@ -104,7 +109,7 @@ class odysseyTenantGenerator:
                     print('Company accounts file exists for: ' + companyName)
                 else:
                     print('Company accounts file does not exist for: ' + companyName)
-                    print('Qutting script')
+                    print('Quitting script')
                     sys.exit()
 
             if accountswithAgreements == 'None':
@@ -114,10 +119,66 @@ class odysseyTenantGenerator:
                     print('Company accounts with agreements file exists for: ' + companyName)
                 else:
                     print('Company accounts with agreements file does not exist for: ' + companyName)
-                    print('Qutting script')
+                    print('Quitting script')
                     sys.exit()
             print('Import file is valid')
 
+    def importTenantsFromCSV(self, csvFileName):
+        tenantSourceFile = self.sourceFilePath + 'tenants/' + csvFileName
+
+        if os.path.exists(tenantSourceFile) == False:
+            print('Source file does not exist - quitting')
+            sys.exit()
+        else:
+            print('Source File Found')
+
+        csvFileReader = csv.DictReader(open(tenantSourceFile))
+
+        for row in csvFileReader:
+            companyName = str(row["companyName"])
+            adminName = str(row["name"])
+            adminEmail = str(row["emailAddress"])
+            licenses = int(row["licenses"])
+            workOrderNumberSeed = int(row["workOrderNumberSeed"])
+            invoiceNumberSeed = int(row["invoiceNumberSeed"])
+            emailDomain = str(row["Email_Domain"])
+            companyHoursFile = str(row["Hours"])
+            companyHolidaysFile = str(row["Holidays"])
+            companyTerritory = str(row["Territories"])
+            employeesList = str(row["Employees"])
+            servicesList = str(row["Services"])
+            teamsList = str(row["Teams"])
+            accountsList = str(row["Accounts"])
+            accountswithAgreements = str(row["AccountswithAgreements"])
+            agreementsPerDay = int(row["AgreementsPerDay"])
+            agreementsDelay = int(row["AgreementDelayinSeconds"])
+
+            odysseyAdminSession = odysseyAdmin()
+            odysseyAdminSession.setAdminEnvironmentURLs('QA')
+            odysseyAdminSession.createTenant(adminName, companyName, adminEmail, 5, 1000, 1000)
+
+            odysseyTenantSession = odysseyAccounts()
+            odysseyTenantSession.setEnvironmentURLs("QA")
+            while len(str(odysseyTenantSession.getAuthorizationToken(adminEmail))) <= 100:
+                print ('Unable to authenticate user, waiting 5 seconds...')
+                time.sleep(5)
+
+            odysseyTenantSession.setAdminAndTenantID(adminEmail)
+            odysseyTenantSession.emailDomain = emailDomain
+            odysseyTenantSession.setCompanyHours(companyHoursFile)
+            odysseyTenantSession.setCompanyHolidays(companyHolidaysFile)        # Allow this to be none
+            odysseyTenantSession.setCompanyTerritory(companyTerritory)
+            odysseyTenantSession.populateEmployeesFromCSV(employeesList)
+            odysseyTenantSession.populateServicesFromCSV(servicesList)
+            odysseyTenantSession.populateTeamsFromCSV(teamsList)                # Allow this to be none
+            if accountsList == 'None':
+                print ('No accounts-only file to import, step will be skipped')
+            else:
+                odysseyTenantSession.populateAccountsWithAgreementsFromCSV('KearnyJerseyCity.csv', agreementsPerDay, agreementsDelay, True)
+            if accountswithAgreements == 'None':
+                print ('No accounts with agreements file to import, step will be skipped')
+            else:
+                odysseyTenantSession.populateAccountsWithAgreementsFromCSV('KearnyJerseyCity.csv', agreementsPerDay, agreementsDelay, True)
 
 class odysseyAdmin:
     Username = 'admin@marathondata.com'
@@ -658,25 +719,9 @@ class odysseyAccounts(odysseyTenant):
 
 
 def main():
-##    timGenerator = odysseyTenantGenerator()
-##    timGenerator.validateTenantsImportFile('tim.csv')
-##    timAdmin = odysseyAdmin()
-##    timAdmin.setAdminEnvironmentURLs('QA')
-##    timAdmin.createTenant('StayinFront Inc', 'StayinFront Inc', 'tbuck@sif4.sif', 5, 1000, 1000)
-    timAccounts = odysseyAccounts()
-    timAccounts.setEnvironmentURLs("QA")
-    while len(str(timAccounts.getAuthorizationToken('tbuck@sif4.sif'))) <= 100:
-        print ('Unable to authenticate user, waiting 5 seconds')
-        time.sleep(5)
-    timAccounts.setAdminAndTenantID('tbuck@sif4.sif')
-##    timAccounts.emailDomain = '@sif4.sif'
-##    timAccounts.setCompanyHours('hours_EST_9-5_S-S_60minBreak.json')
-##    timAccounts.setCompanyHolidays('holidays_Static_Holidays.json')
-##    timAccounts.setCompanyTerritory('territories_NJ_Only.json')
-##    timAccounts.populateEmployeesFromCSV('template.csv')
-##    timAccounts.populateServicesFromCSV('services_Basic-One_Of_Each.csv')
-##    timAccounts.populateTeamsFromCSV('teams_A-Team.csv')
-    timAccounts.populateAccountsWithAgreementsFromCSV('KearnyJerseyCity.csv', 10, 1, True)
+    newTenantGenerator = odysseyTenantGenerator()
+    newTenantGenerator.validateTenantsImportFile('tim.csv')
+    newTenantGenerator.importTenantsFromCSV('tim.csv')
     pass
 
 if __name__ == '__main__':
