@@ -50,7 +50,7 @@ class odysseyTenantGenerator:
                 servicesList = str(row["Services"])
                 teamsList = str(row["Teams"])
                 accountsList = str(row["Accounts"])
-                accountswithAgreements = str(row["AccountswithAgreements"])
+                #accountswithAgreements = str(row["AccountswithAgreements"])
                 agreementsPerDay = int(row["AgreementsPerDay"])
                 agreementsDelay = int(row["AgreementDelayinSeconds"])
             except:
@@ -112,7 +112,7 @@ class odysseyTenantGenerator:
                     print('Quitting script')
                     sys.exit()
 
-            if accountswithAgreements == 'None':
+            if agreementsPerDay == '0':
                 print('No accounts with agreements file to import, step will be skipped')
             else:
                 if os.path.exists(self.sourceFilePath + 'accounts/' + accountswithAgreements) == True:
@@ -149,7 +149,7 @@ class odysseyTenantGenerator:
             servicesList = str(row["Services"])
             teamsList = str(row["Teams"])
             accountsList = str(row["Accounts"])
-            accountswithAgreements = str(row["AccountswithAgreements"])
+            #accountswithAgreements = str(row["AccountswithAgreements"])
             agreementsPerDay = int(row["AgreementsPerDay"])
             agreementsDelay = int(row["AgreementDelayinSeconds"])
 
@@ -175,7 +175,7 @@ class odysseyTenantGenerator:
                 print ('No accounts-only file to import, step will be skipped')
             else:
                 odysseyTenantSession.populateAccountsWithAgreementsFromCSV('KearnyJerseyCity.csv', agreementsPerDay, agreementsDelay, True)
-            if accountswithAgreements == 'None':
+            if agreementsPerDay == '0':
                 print ('No accounts with agreements file to import, step will be skipped')
             else:
                 odysseyTenantSession.populateAccountsWithAgreementsFromCSV('KearnyJerseyCity.csv', agreementsPerDay, agreementsDelay, True)
