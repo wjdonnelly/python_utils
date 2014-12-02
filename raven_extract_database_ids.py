@@ -16,9 +16,9 @@ import requests
 #input the url
 server = "ngp-qa-db"
 port = "8080"
-url_base = "http://" + server + ":" + port + "/" 
+dbServer = "http://" + server + ":" + port + "/" 
 api_call = "databases"
-url = url_base + api_call 
+url = dbServer + api_call 
 params = {"pageSize" : "1024"}
 
 #set the output file for the test data

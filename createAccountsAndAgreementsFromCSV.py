@@ -184,9 +184,9 @@ def createAccountsAndAgreementsfromCSV(csvFilePath, agreementsPerDay, AccountsUR
 
 
 def authorize(email):
-    url_base = "http://ngp-qa-web:85/"
+    dbServer = "http://ngp-qa-web:85/"
     api_call = "api/token"
-    auth_url = url_base + api_call
+    auth_url = dbServer + api_call
     payload = "grant_type=password&username=" + email + "&password=letmein123&scope=marathon_odyssey"
     headers = {}
     r = requests.post(auth_url, payload, headers=headers)

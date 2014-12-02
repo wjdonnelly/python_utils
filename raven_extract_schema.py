@@ -72,15 +72,15 @@ def callAPI(url, payload, headers, multiplier):
 metadata = 0 #by default, don't extract metadata fields
 server = "ngp-qa-db"
 port = "8080"
-url_base = "http://" + server + ":" + port + "/" 
+dbServer = "http://" + server + ":" + port + "/" 
 api_call = "databases"
-url = url_base + api_call 
+url = dbServer + api_call 
 params = {"pageSize" : "1"}
 
 #pick a sample database
 dbid  = "0b3f2f6c-8a9a-4385-a0f6-61e9261a4f1d"
 
-url = url_base + api_call + "/" + dbid + "/indexes/dynamic/Accounts"
+url = dbServer + api_call + "/" + dbid + "/indexes/dynamic/Accounts"
 params = {"pageSize" : "1"}
 
 #r = requests.get(url, params = params)
@@ -88,7 +88,7 @@ params = {"pageSize" : "1"}
 #for each doc_type in the collection, pull out
 #one document instance for parsing out the JSON
 for doc in collections:
-    url = url_base + api_call + "/" + dbid + "/indexes/dynamic/" + doc
+    url = dbServer + api_call + "/" + dbid + "/indexes/dynamic/" + doc
     r = requests.get(url, params = params)
     s = r.json()
     #this extracts the 1st level JSON property names from the document

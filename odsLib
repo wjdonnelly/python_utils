@@ -25,29 +25,29 @@ class odyssey():
     
         self.filePath = '//mds-fs01/pitcrew/api_testing/'
         serverName = 'http://ngp-qa-web'
-        self.appServerName = 'http://ngp-qa-web'
-        self.appServerAdminPort = ':86/'
-        self.appServerAPIPort = ':85/'
+        self.serverName = 'http://ngp-qa-web'
+        self.serverAdminPort = ':86/'
+        self.serverAPIPort = ':85/'
         self.voloAPIKey = 'ODYS-SEYO-DYSS-EYOD'
         self.scriptFile = "test.csv"     
         logFilePathAdmin = self.filePath + "Logs/Administration/"
         self.adminPassword = 'letmein123'
         self.adminUserName = 'admin@marathondata.com'
     try:
-        requests.get(self.appServerName)
+        requests.get(self.serverName)
     except:
-        print("Network Error reaching " + appServerName)
-        sys.exit("Network Error reaching " + appServerName)
+        print("Network Error reaching " + serverName)
+        sys.exit("Network Error reaching " + serverName)
         
-    response = requests.get(appServerName)
+    response = requests.get(serverName)
     if response.status_code > 204:
-        print("Network Error reaching " + appServerName + " Status Code = " + str(response.status_code))
-        sys.exit("Error reaching " + appServerName + " Status Code = " + str(response.status_code))
+        print("Network Error reaching " + serverName + " Status Code = " + str(response.status_code))
+        sys.exit("Error reaching " + serverName + " Status Code = " + str(response.status_code))
 
 
 
     def validate(self):
-        tenantSourceFile = self.filePath + 'tenants/' + self.scriptFile
+        tenantSourceFile = self.sourceFilePath + 'tenants/' + self.scriptFile
 
         if os.path.exists(tenantSourceFile) == False:
             print('Source file does not exist - quitting')
@@ -82,7 +82,7 @@ class odyssey():
                 print('Source file incomplete, check all rows against format of template.csv')
                 sys.exit()
 
-            if os.path.exists(self.filePath + 'companyhours/' + companyHoursFile) == True:
+            if os.path.exists(self.sourceFilePath + 'companyhours/' + companyHoursFile) == True:
                 print('Company hours file exists for: ' + companyName)
             else:
                 print('Company hours file does not exist for: ' + companyName)
@@ -92,35 +92,35 @@ class odyssey():
 
 
 
-            if os.path.exists(self.filePath + 'holidays/' + companyHolidaysFile) == True:
+            if os.path.exists(self.sourceFilePath + 'holidays/' + companyHolidaysFile) == True:
                 print('Company holidays file exists for: ' + companyName)
             else:
                 print('Company holidays file does not exist for: ' + companyName)
                 print('Quitting script')
                 sys.exit()
 
-            if os.path.exists(self.filePath + 'territories/' + companyTerritory) == True:
+            if os.path.exists(self.sourceFilePath + 'territories/' + companyTerritory) == True:
                 print('Company territory file exists for: ' + companyName)
             else:
                 print('Company territory file does not exist for: ' + companyName)
                 print('Quitting script')
                 sys.exit()
 
-            if os.path.exists(self.filePath + 'employees/' + employeesList) == True:
+            if os.path.exists(self.sourceFilePath + 'employees/' + employeesList) == True:
                 print('Company employee file exists for: ' + companyName)
             else:
                 print('Company employee file does not exist for: ' + companyName)
                 print('Quitting script')
                 sys.exit()
 
-            if os.path.exists(self.filePath + 'services/' + servicesList) == True:
+            if os.path.exists(self.sourceFilePath + 'services/' + servicesList) == True:
                 print('Company services file exists for: ' + companyName)
             else:
                 print('Company services file does not exist for: ' + companyName)
                 print('Quitting script')
                 sys.exit()
 
-            if os.path.exists(self.filePath + 'teams/' + teamsList) == True:
+            if os.path.exists(self.sourceFilePath + 'teams/' + teamsList) == True:
                 print('Company teams file exists for: ' + companyName)
             else:
                 print('Company teams file does not exist for: ' + companyName)
@@ -130,7 +130,7 @@ class odyssey():
             if accountsList == 'None':
                 print('No accounts-only file to import, step will be skipped')
             else:
-                if os.path.exists(self.filePath + 'accounts/' + accountsList) == True:
+                if os.path.exists(self.sourceFilePath + 'accounts/' + accountsList) == True:
                     print('Company accounts file exists for: ' + companyName)
                 else:
                     print('Company accounts file does not exist for: ' + companyName)
@@ -150,7 +150,7 @@ class odyssey():
             print('Import file is valid')
 
     def importTenantsFromCSV(self, csvFileName):
-        tenantSourceFile = self.filePath + 'tenants/' + csvFileName
+        tenantSourceFile = self.sourceFilePath + 'tenants/' + csvFileName
 
         if os.path.exists(tenantSourceFile) == False:
             print('Source file does not exist - quitting')
@@ -194,9 +194,9 @@ class odyssey():
             odysseyTenantSession.setCompanyHours(companyHoursFile)
             odysseyTenantSession.setCompanyHolidays(companyHolidaysFile)        # Allow this to be none
             odysseyTenantSession.setCompanyTerritory(companyTerritory)
-            odysseyTenantSession.populateEmployees(employeesList)
-            odysseyTenantSession.populateServices(servicesList)
-            odysseyTenantSession.populateTeams(teamsList)                # Allow this to be none
+            odysseyTenantSession.populateEmployeesFromCSV(employeesList)
+            odysseyTenantSession.populateServicesFromCSV(servicesList)
+            odysseyTenantSession.populateTeamsFromCSV(teamsList)                # Allow this to be none
             if accountsList == 'None':
                 print ('No accounts-only file to import, step will be skipped')
             else:
@@ -213,16 +213,16 @@ class __odysseyAdmin__:
 
     def __setAdminEnvironment__(self, env):
         if env.lower() == 'qa':
-            self.appServerName = 'ngp-qa-web'
-            self.appServerAdminPort = '86'
-            self.appServerAPIPort = '85'
+            self.serverURL = 'ngp-qa-web'
+            self.serverAdminPort = '86'
+            self.serverAPIport = '85'
         if env.lower() == 'localhost':
-            self.appServerName = 'localhost'
-            self.appServerAdminPort = '86'
-            self.appServerAPIPort = '85'
-        self.adminTokenURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/token'
-        self.adminTenantsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenants'
-        self.adminSchedulingLicensingURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/schedulinglicensing/'
+            self.serverURL = 'localhost'
+            self.serverAdminPort = '86'
+            self.serverAPIport = '85'
+        self.adminTokenURL = 'http://' + self.serverURL + ':' + self.serverAdminPort + '/administration/token'
+        self.adminTenantsURL = 'http://' + self.serverURL + ':' + self.serverAdminPort + '/administration/tenants'
+        self.adminSchedulingLicensingURL = 'http://' + self.serverURL + ':' + self.serverAdminPort + '/administration/schedulinglicensing/'
 
     def createTenant(self, tenantAdminName, CompanyName, tenantAdminEmail, LicenseCount, wordOrderNSeedumber, invoiceNumberSeed):
         headers = {'content-type': 'application/json', 'Authorization' : (odysseyAdmin.getAdminAuthorizationToken(self, self.Username))}
@@ -308,32 +308,32 @@ class odysseyTenant:
     tenantID = ''
 
     logFilePath = "//mds-fs01/pitcrew/api_testing/Logs/"
-    filePath = "//mds-fs01/pitcrew/api_testing/"
+    sourceFilePath = "//mds-fs01/pitcrew/api_testing/"
 
     def setEnvironmentURLs(self, env):
         if env.lower() == 'qa':
-            self.appServerName = 'ngp-qa-web'
-            self.appServerAdminPort = '86'
-            self.appServerAPIPort = '85'
+            self.serverURL = 'ngp-qa-web'
+            self.serverAdminPort = '86'
+            self.serverAPIport = '85'
             self.dbServer = 'ngp-qa-db'
         if env.lower() == 'localhost':
-            self.appServerName = 'localhost'
-            self.appServerAdminPort = '86'
-            self.appServerAPIPort = '85'
+            self.serverURL = 'localhost'
+            self.serverAdminPort = '86'
+            self.serverAPIport = '85'
             self.dbServer = 'localhost'
-        self.apiTokenURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/token'
-        self.adminTokenURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/token'
-        self.adminTenantsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenants'
-        self.apiAccountsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/accounts'
-        self.apiAgreementsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceAgreements'
-        self.apiServiceOfferingsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceofferings'
-        self.apiServiceHoursURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceHours'
-        self.apiCompanyHolidsaysURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/companyHolidays'
-        self.apiServiceTerritoriesURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceTerritories'
-        self.adminUsersURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/users'
-        self.adminTenantAdministratorsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenantadministrator'
-        self.apiTechniciansURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/technicians'
-        self.apiTeamsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/teams'
+        self.apiTokenURL = 'http://' + self.serverURL + ':' + self.serverAPIport + '/api/token'
+        self.adminTokenURL = 'http://' + self.serverURL + ':' + self.serverAdminPort + '/administration/token'
+        self.adminTenantsURL = 'http://' + self.serverURL + ':' + self.serverAdminPort + '/administration/tenants'
+        self.apiAccountsURL = 'http://' + self.serverURL + ':' + self.serverAPIport + '/api/accounts'
+        self.apiAgreementsURL = 'http://' + self.serverURL + ':' + self.serverAPIport + '/api/serviceAgreements'
+        self.apiServiceOfferingsURL = 'http://' + self.serverURL + ':' + self.serverAPIport + '/api/serviceofferings'
+        self.apiServiceHoursURL = 'http://' + self.serverURL + ':' + self.serverAPIport + '/api/serviceHours'
+        self.apiCompanyHolidsaysURL = 'http://' + self.serverURL + ':' + self.serverAPIport + '/api/companyHolidays'
+        self.apiServiceTerritoriesURL = 'http://' + self.serverURL + ':' + self.serverAPIport + '/api/serviceTerritories'
+        self.adminUsersURL = 'http://' + self.serverURL + ':' + self.serverAdminPort + '/administration/users'
+        self.adminTenantAdministratorsURL = 'http://' + self.serverURL + ':' + self.serverAdminPort + '/administration/tenantadministrator'
+        self.apiTechniciansURL = 'http://' + self.serverURL + ':' + self.serverAPIport + '/api/technicians'
+        self.apiTeamsURL = 'http://' + self.serverURL + ':' + self.serverAPIport + '/api/teams'
     pass
 
     def setAdminAndTenantID(self, email):
@@ -348,7 +348,7 @@ class odysseyTenant:
             result = 'Failure'
         return(result);
 
-    def __createLogFileName__(self, functionCalling):
+    def createLogFileName(self, functionCalling):
         i = datetime.datetime.now()
         dt = i.strftime('%Y%m%d-%H%M%S')
         logFolderName = self.AdminEmail
@@ -401,8 +401,8 @@ class odysseyTenant:
 
     def setCompanyHours(self, companyHoursInJSON):
         headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-        logFileName = self.__createLogFileName__('setCompanyHours')
-        companyHoursSourceFile = self.filePath + 'CompanyHours/' + companyHoursInJSON
+        logFileName = self.createLogFileName('setCompanyHours')
+        companyHoursSourceFile = self.sourceFilePath + 'CompanyHours/' + companyHoursInJSON
         jsonCompanyHours = open(companyHoursSourceFile, 'rb')
         payloadCompanyHours = jsonCompanyHours.read()
 
@@ -412,8 +412,8 @@ class odysseyTenant:
 
     def setCompanyHolidays(self, companyHolidsaysInJSON):
         headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-        logFileName = self.__createLogFileName__('setHolidays')
-        holidaysSourceFile = self.filePath + 'Holidays/' + companyHolidsaysInJSON
+        logFileName = self.createLogFileName('setHolidays')
+        holidaysSourceFile = self.sourceFilePath + 'Holidays/' + companyHolidsaysInJSON
         jsonHolidays = open(holidaysSourceFile, 'rb')
         payloadHolidays = jsonHolidays.read()
 
@@ -423,18 +423,18 @@ class odysseyTenant:
 
     def setCompanyTerritory(self, companyTerritoryInJSON):
             headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-            logFileName = self.__createLogFileName__('setTerritory')
-            territorySourceFile = self.filePath + 'Territories/' + companyTerritoryInJSON
+            logFileName = self.createLogFileName('setTerritory')
+            territorySourceFile = self.sourceFilePath + 'Territories/' + companyTerritoryInJSON
             jsonTerritory = open(territorySourceFile, 'rb')
             payloadTerritory = jsonTerritory.read()
 
             jsonResponseFromCompanyHolidaysd = odysseyTenant.callAPIreturningJSON(self, self.apiServiceTerritoriesURL, headers, payloadTerritory, logFileName)
     pass
 
-    def populateServices(self, csvFile):
+    def populateServicesFromCSV(self, csvFile):
             headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-            logFileName = self.__createLogFileName__('CreateServices')
-            serviceSourceFile = self.filePath + 'Services/' + csvFile
+            logFileName = self.createLogFileName('CreateServices')
+            serviceSourceFile = self.sourceFilePath + 'Services/' + csvFile
             csvFileReader = csv.DictReader(open(serviceSourceFile))
 
             for row in csvFileReader:
@@ -466,11 +466,11 @@ class odysseyTenant:
                     jsonResponseFromService = odysseyTenant.callAPIreturningJSON(self, self.apiServiceOfferingsURL, headers, servicePayload, logFileName)
     pass
 
-    def populateEmployees(self, csvFile):
-        employeeSourceFile = self.filePath + 'Employees/' + csvFile
+    def populateEmployeesFromCSV(self, csvFile):
+        employeeSourceFile = self.sourceFilePath + 'Employees/' + csvFile
         csvFileReader = csv.DictReader(open(employeeSourceFile))
         headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-        logFileName = self.__createLogFileName__('CreateEmployees')
+        logFileName = self.createLogFileName('CreateEmployees')
 
         for row in csvFileReader:
             userIDfromResponse = ''
@@ -521,11 +521,11 @@ class odysseyTenant:
                 jsonResponseFromTechnician = odysseyTenant.callAPIreturningJSON(self, self.apiTechniciansURL, headers, technicianPayload, logFileName)
     pass
 
-    def populateTeams(self, csvFile):
-        teamSourceFile = self.filePath + 'Teams/' + csvFile
+    def populateTeamsFromCSV(self, csvFile):
+        teamSourceFile = self.sourceFilePath + 'Teams/' + csvFile
         csvFileReader = csv.DictReader(open(teamSourceFile))
         headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-        logFileName = self.__createLogFileName__('CreateTeams')
+        logFileName = self.createLogFileName('CreateTeams')
 
         for row in csvFileReader:
             post_body_team = { \
@@ -560,7 +560,7 @@ class odysseyTenant:
 
 class odysseyAccounts(odysseyTenant):
     def populateAccountsWithAgreementsFromCSV(self, csvFile, agreementsPerDay, delayBetweenAccountCreationinSeconds, AssertAgreements):
-        accountSourceFile = self.filePath + 'Accounts/' + csvFile
+        accountSourceFile = self.sourceFilePath + 'Accounts/' + csvFile
         csvFileReader = csv.DictReader(open(accountSourceFile))
         today_date = datetime.date.today()
         initialCommitmentWindowStart = datetime.datetime.now()
@@ -569,7 +569,7 @@ class odysseyAccounts(odysseyTenant):
         initialCommitmentWindowEnd_iso = ''
         countOfAgreements = 0
         headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-        logFileName = self.__createLogFileName__('CreateAccountsWithAgreements')
+        logFileName = self.createLogFileName('CreateAccountsWithAgreements')
 
         requestServices = requests.get(self.apiServiceOfferingsURL, headers=headers)
         services = requestServices.json()
@@ -596,11 +596,11 @@ class odysseyAccounts(odysseyTenant):
             }
 
             accountPayload = json.dumps(post_body_account)
-            accountResults = odysseyTenant.callAPIreturningJSON(self, self.apiAccountsURL, headers, accountPayload, logFileName)
+            jsonResponseFromAccount = odysseyTenant.callAPIreturningJSON(self, self.apiAccountsURL, headers, accountPayload, logFileName)
 
-            if accountResults == 401:
+            if jsonResponseFromAccount == 401:
                 headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-                accountResults = odysseyTenant.callAPIreturningJSON(self, self.apiAccountsURL, headers, accountPayload, logFileName)
+                jsonResponseFromAccount = odysseyTenant.callAPIreturningJSON(self, self.apiAccountsURL, headers, accountPayload, logFileName)
 
             initialCommitmentWindowStart_iso = initialCommitmentWindowStart.strftime("%Y-%m-%dT00:15:00")
             initialCommitmentWindowEnd_iso = initialCommitmentWindowEnd.strftime("%Y-%m-%dT23:45:00")
@@ -608,10 +608,10 @@ class odysseyAccounts(odysseyTenant):
             todayDateFormatted = today_date.strftime("%Y-%m-%d")
 
             post_body_agreement = {
-                "accountId" : str(accountResults['id']), \
+                "accountId" : str(jsonResponseFromAccount['id']), \
                     "billingAddress" : { 'city': str(row["City"]), \
                           "country" : str(row["Country"]), \
-                          "id" : str(accountResults['address']['id']),\
+                          "id" : str(jsonResponseFromAccount['address']['id']),\
                           'latitude': str(row["Latitude"]), \
                           'lineOne': str(row["Address 1"]), \
                           "lineTwo" : "",\
@@ -621,8 +621,8 @@ class odysseyAccounts(odysseyTenant):
                     'stateAbbreviation': str(row["State Abbreviation"]) \
                         },\
                   "contact" : { "email" : "",\
-                      "id" : str(accountResults['contact']['id']),\
-                      "name" : str(accountResults['contact']['name']),\
+                      "id" : str(jsonResponseFromAccount['contact']['id']),\
+                      "name" : str(jsonResponseFromAccount['contact']['name']),\
                       "phone" : ""\
                     },\
                   "effectiveDate" : todayDateFormatted,\
@@ -636,7 +636,7 @@ class odysseyAccounts(odysseyTenant):
                   "preferredStartTime" : "00:00:00",\
                   "serviceAddress" : { 'city': str(row["City"]), \
                       "country" : str(row["Country"]), \
-                      "id" : str(accountResults['address']['id']), \
+                      "id" : str(jsonResponseFromAccount['address']['id']), \
                       "latitude" : str(row["Latitude"]), \
                       "lineOne" : str(row["Address 1"]), \
                       "lineTwo" : "",\
@@ -687,16 +687,16 @@ class odysseyAccounts(odysseyTenant):
             time.sleep(delayBetweenAccountCreationinSeconds)
 
             if AssertAgreements == True:
-                self.logAgreementAssertion(self.tenantID, str(accountResults['id']), str(row["Company Name"]), str(initialCommitmentWindowStart.strftime("%Y-%m-%d")), self.dbServer, self.appServerName)
+                self.logAgreementAssertion(self.tenantID, str(jsonResponseFromAccount['id']), str(row["Company Name"]), str(initialCommitmentWindowStart.strftime("%Y-%m-%d")), self.dbServer, self.serverURL)
 
             print ('Count Of Agreements: ' + str(countOfAgreements) + '\n')
     pass
 
     def populateAccountsFromCSV(self, csvFile):
-            accountSourceFile = self.filePath + 'Accounts/' + csvFile
+            accountSourceFile = self.sourceFilePath + 'Accounts/' + csvFile
             csvFileReader = csv.DictReader(open(accountSourceFile))
             headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-            logFileName = self.__createLogFileName__('CreateAccounts')
+            logFileName = self.createLogFileName('CreateAccounts')
 
             for row in csvFileReader:
                 post_body_account = { \
@@ -719,15 +719,15 @@ class odysseyAccounts(odysseyTenant):
 
                 accountPayload = json.dumps(post_body_account)
 
-                accountResults = odysseyTenant.callAPIreturningJSON(self, self.apiAccountsURL, headers, accountPayload, logFileName)
+                jsonResponseFromAccount = odysseyTenant.callAPIreturningJSON(self, self.apiAccountsURL, headers, accountPayload, logFileName)
 
-                if accountResults == 401:
+                if jsonResponseFromAccount == 401:
                     headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-                    accountResults = odysseyTenant.callAPIreturningJSON(self, self.apiAccountsURL, headers, accountPayload, logFileName)
+                    jsonResponseFromAccount = odysseyTenant.callAPIreturningJSON(self, self.apiAccountsURL, headers, accountPayload, logFileName)
     pass
 
     def logAgreementAssertion(self, tenant, accountId, accountName, serviceDate, dbServer, apiServer):
-        assertionLogFilePath = self.filePath + 'Assertions/Agreements_' + str(datetime.datetime.now().strftime("%Y%m%d")) + '.csv'
+        assertionLogFilePath = self.sourceFilePath + 'Assertions/Agreements_' + str(datetime.datetime.now().strftime("%Y%m%d")) + '.csv'
         log_output = tenant + ',' + accountId + ',' + accountName + ',' + serviceDate + ',' + dbServer + ','+ apiServer + '\n'
         if os.path.exists(assertionLogFilePath) == False:
             assertionLogFile = open(assertionLogFilePath, 'a')

@@ -21,7 +21,7 @@ def callAPI(url, payload, headers, multiplier):
 
 
 #input the script url
-url_base = "http://ngp-qa-db:8080/"
+dbServer = "http://ngp-qa-db:8080/"
 
 #set up the api call for the end of the URL string
 api_call = "indexes/accounts"
@@ -54,7 +54,7 @@ for dbid in databaseFile.xreadlines():
     dbid=dbid.strip('\n')
     dbid=dbid.strip('\r')
     #from the compete URL for the current dbid
-    url = url_base + "databases/" + dbid + "/" + api_call
+    url = dbServer + "databases/" + dbid + "/" + api_call
     print(url)
 
     #set up the request header and body

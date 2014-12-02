@@ -15,7 +15,7 @@ import csv
 
 #set the constants
 #input the url
-url_base = "http://raven2:8080/databases/pp1-b448e853-f94a-4e30-8c11-a71d670a4707/streams/query/Auto/Accounts/ByAccountNumber?&pageSize=1024&format=excel"
+dbServer = "http://raven2:8080/databases/pp1-b448e853-f94a-4e30-8c11-a71d670a4707/streams/query/Auto/Accounts/ByAccountNumber?&pageSize=1024&format=excel"
 
 outputFilename = "c:/sites/test_ravencsv2.csv"
 outputFile = open(outputFilename, 'w')
@@ -28,15 +28,15 @@ for i in range(1, numberofloops):
     #construct the URL
     if i == 1:
         page = 1024
-        url = url_base
+        url = dbServer
         page = page + 1
     else:
-        url = url_base + "&start=" + str(page)
+        url = dbServer + "&start=" + str(page)
         page = page + 1024
         
     print(url + '\n')
     #call the ravendb api
-    response = urllib2.urlopen(url_base)
+    response = urllib2.urlopen(dbServer)
 
     output = response.read()
     #remove the trailing comma

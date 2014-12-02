@@ -22,9 +22,9 @@ def callAPI(url, payload, headers, multiplier):
     return;
 
 def authorize():
-    url_base = "http://ngp-qa-web:85/"
+    dbServer = "http://ngp-qa-web:85/"
     api_call = "api/token"
-    auth_url = url_base + api_call
+    auth_url = dbServer + api_call
     payload = "grant_type=password&username=tim@mds.mds&password=letmein123&scope=marathon_odyssey"
     headers = {}
     r = requests.post(auth_url, payload, headers=headers)
@@ -42,9 +42,9 @@ mode = "cps" #mode can be cps or script
 multiplier = 30
 start_hour = "11"
 #input the script url
-url_base = "http://ngp-qa-web:85/"
+dbServer = "http://ngp-qa-web:85/"
 api_call = "odyssey/accounts/details/Accounts%2f1"
-url = url_base + api_call
+url = dbServer + api_call
 params = {}
 token = ""
 
@@ -166,7 +166,7 @@ else:
         #construct the URL
         if i == 1:
             page = 1024
-            url = url_base
+            url = dbServer
             page = page + 1
             print("called " + url + '\n')
             response = urllib2.urlopen(url)
@@ -177,7 +177,7 @@ else:
             response = ""
             
         else:
-            url = url_base + "&start=" + str(page)
+            url = dbServer + "&start=" + str(page)
             page = page + 1024
             print("called " + url + '\n')
             response = urllib2.urlopen(url)

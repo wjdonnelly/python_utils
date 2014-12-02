@@ -37,9 +37,9 @@ def callAPI(url, headers, payload, logFileName):
     return(output);
 
 def authorize(email):
-    url_base = "http://ngp-qa-web:85/"
+    dbServer = "http://ngp-qa-web:85/"
     api_call = "api/token"
-    auth_url = url_base + api_call
+    auth_url = dbServer + api_call
     payload = "grant_type=password&username=" + email + "&password=letmein123&scope=marathon_odyssey"
     headers = {}
     r = requests.post(auth_url, payload, headers=headers)
@@ -50,9 +50,9 @@ def authorize(email):
     return(full_token);
 
 def admin_authorize(email):
-    url_base = "http://ngp-qa-web:86/"
+    dbServer = "http://ngp-qa-web:86/"
     api_call = "administration/token"
-    auth_url = url_base + api_call
+    auth_url = dbServer + api_call
     payload = "grant_type=password&username=" + email + "&password=letmein123&scope=marathon_admin"
     headers = {}
     r = requests.post(auth_url, payload, headers=headers)
@@ -299,7 +299,7 @@ if admin_token == "":
 
 print(admin_token)
 #set up base_url
-url_base = "http://ngp-qa-web"
+dbServer = "http://ngp-qa-web"
 
 
 
@@ -317,7 +317,7 @@ for tenant in tenant_array:
 
     #set up the url
     api_call = ":86/administration/tenants"
-    url = url_base + api_call
+    url = dbServer + api_call
 
     #set up the request header and body
     
@@ -346,7 +346,7 @@ for tenant in tenant_array:
         id = output.content
         break
     #log the results
-    #output = url_base + "," + str(output.status_code) +  "," + str(output.elapsed) + "," + tenant['Tenant_Admin_Email'] + "," + dbid  + '\n'
+    #output = dbServer + "," + str(output.status_code) +  "," + str(output.elapsed) + "," + tenant['Tenant_Admin_Email'] + "," + dbid  + '\n'
     #sys.stdout.write(output)
  
     #output the line to the output file
@@ -362,7 +362,7 @@ for tenant in tenant_array:
 
    #set up the service hours
     api_call = ":85/api/serviceHours"
-    url = url_base + api_call
+    url = dbServer + api_call
     #output = useJSONFile(url, headers, "hours_9-5MF_NoBreaks_EST.json")
     output = useJSONFile(url, headers, "Hours\\" + tenant['Hours'], logFileName)
     if output.status_code > 204:
@@ -371,7 +371,7 @@ for tenant in tenant_array:
 
     #set up the Territories
     api_call = ":85/api/serviceTerritories"
-    url = url_base + api_call
+    url = dbServer + api_call
     output = useJSONFile(url, headers, "Territories\\" + tenant['Territories'], logFileName)
     if output.status_code > 204:
         print(output.content)
@@ -379,7 +379,7 @@ for tenant in tenant_array:
         
      #set up the services
     api_call = ":85/api/serviceOfferings"
-    url = url_base + api_call
+    url = dbServer + api_call
     output = createServices(url, headers, "Services\\" + tenant['Services'], logFileName)
     if output.status_code > 204:
         print(output.content)
@@ -387,7 +387,7 @@ for tenant in tenant_array:
 
      #set up the holidays
     api_call = ":85/api/companyHolidays"
-    url = url_base + api_call
+    url = dbServer + api_call
     output = useJSONFile(url, headers, "Holidays\\" + tenant['Holidays'], logFileName)
     if output.status_code > 204:
         print(output.content)
@@ -395,7 +395,7 @@ for tenant in tenant_array:
 
   #set up the teams
     api_call = ":85/api/teams"
-    url = url_base + api_call
+    url = dbServer + api_call
     output = createTeams(url, headers, "Teams\\" + tenant['Teams'], logFileName)
     if output.status_code > 204:
         print(output.content)
@@ -403,7 +403,7 @@ for tenant in tenant_array:
 
     #set up the employees
     api_call = ""
-    url = url_base + api_call
+    url = dbServer + api_call
     
     output = createEmployees(url, headers,  "Employees\\" + tenant['Employees'], tenant["Email_Domain"], dbid, logFileName)
     if output.status_code > 204:

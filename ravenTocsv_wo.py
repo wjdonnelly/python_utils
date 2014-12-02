@@ -15,7 +15,7 @@ import csv
 
 #set the constants
 #input the url
-url_base = "http://raven2:8080/databases/pp1-b448e853-f94a-4e30-8c11-a71d670a4707/streams/query/allWorkOrders?format=excel&pagesize=1024"
+dbServer = "http://raven2:8080/databases/pp1-b448e853-f94a-4e30-8c11-a71d670a4707/streams/query/allWorkOrders?format=excel&pagesize=1024"
 
 outputFilename = "c:/sites/test_raven_workorders.csv"
 outputFile = open(outputFilename, 'w')
@@ -28,7 +28,7 @@ for i in range(1, numberofloops):
     #construct the URL
     if i == 1:
         page = 1024
-        url = url_base
+        url = dbServer
         page = page + 1
         print("called " + url + '\n')
         response = urllib2.urlopen(url)
@@ -39,7 +39,7 @@ for i in range(1, numberofloops):
         response = ""
         
     else:
-        url = url_base + "&start=" + str(page)
+        url = dbServer + "&start=" + str(page)
         page = page + 1024
         print("called " + url + '\n')
         response = urllib2.urlopen(url)

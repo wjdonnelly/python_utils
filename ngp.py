@@ -52,21 +52,21 @@ class ngp:
 
 class raven():
 
-    def __init__(self, url_base, dbid):
+    def __init__(self, dbServer, dbid):
        
         
-        self.server = url_base
+        self.server = dbServer
         self.dbid = dbid
         try:
-            requests.get(url_base)
+            requests.get(dbServer)
         except:
-            print("Network Error reaching " + url_base)
-            sys.exit("Network Error reaching " + url_base)
+            print("Network Error reaching " + dbServer)
+            sys.exit("Network Error reaching " + dbServer)
         
-        response = requests.get(url_base)
+        response = requests.get(dbServer)
         if response.status_code > 204:
-            print("Network Error reaching " + url_base + " Status Code = " + str(response.status_code))
-            sys.exit("Error reaching " + url_base + " Status Code = " + str(response.status_code))
+            print("Network Error reaching " + dbServer + " Status Code = " + str(response.status_code))
+            sys.exit("Error reaching " + dbServer + " Status Code = " + str(response.status_code))
 
     def getCollections(self):
         apiCall = "/indexes/Raven/DocumentsbyEntityName"
