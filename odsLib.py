@@ -1013,9 +1013,9 @@ class odyssey():
                             params = {}
                             results = self.__getAPI__(apiCall, params)
                             print(results["statusCode"])
-                            print(re.sub("results["content"])
+                            print(re.sub('.{8}-.{4}-.{4}-.{4}-.{12}', "0000-0000-0000", results["content"]))
                             
-                            re.sub('[0-9]{4}\.[0-9]{4}\.[0-9]{4}', 'xxx', guid)
+                        
                         #write the results to the file
                         
                         # = line + '\n'
