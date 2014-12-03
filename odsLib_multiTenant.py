@@ -25,61 +25,31 @@ import re
 #from accounts_loadtest import url
 
 class odyssey():
-    def __init__(self, env = "QA"):
+    def __init__(self, env):
 
-        self.filePath = os.getcwd() + "\\"
-        
 
     #read the config file and set the config variables
 
-        self.logFilePath = self.filePath
-        
-        companyName = "Gold Tenant"
-        licenses = 
-        workOrderNumberSeed = 
-        invoiceNumberSeed = 
-        emailDomain = 
-        
-        companyHoursFile = 
-        companyHolidaysFile = 
-        companyTerritory = 
-        employeesList =
-        servicesList = 
-        teamsList = 
-        accountsList = 
-        #accountswithAgreements = str(row["AccountswithAgreements"])
-        agreementsPerDay = 
-        agreementsDelay = 
-
-        #read from file
+        self.filePath = '//mds-fs01/pitcrew/api_testing/'
+        self.logFilePath = '//mds-fs01/pitcrew/api_testing/logs/'
         self.appServerName = 'ngp-qa-web'
-        
-        #read from file
         self.voloAPIKey = 'ODYS-SEYO-DYSS-EYOD'
-        
-        #hardcode 
-        self.scriptFile = self.filePath + "environmentConfigs.csv" #hard code
+        self.scriptFile = "eap_boston_3.csv" #hard code
 
-        #may deprecate
         self.dbServerName = 'ngp-qa-db'
         self.dbServerPort = '8080'
         self.dbServerURL = "http://" + self.dbServerName + ":" + self.dbServerPort
-       
-        #read in from the config
         self.appServerAdminPort = '86'
         self.appServerAPIPort = '85'
-        
-        #???
-        #self.logFilePathAdmin = self.filePath + "Logs/Administration/"
-        
+
+
+        self.logFilePathAdmin = self.filePath + "Logs/Administration/"
         self.sysAdminPassword = 'letmein123'
         self.sysAdminEmail = 'admin@marathondata.com'
 
         #hard code
-        #self.sysAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAdminPort + '/administration/token'
-        #self.tenantAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAPIPort + '/api/token'
-        
-        
+        self.sysAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAdminPort + '/administration/token'
+        self.tenantAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAPIPort + '/api/token'
         self.tenantAdminPassword = "letmein123"
         self.adminSchedulingLicensingURL = 'http://' + self.appServerName + ":" + self.appServerAdminPort + '/administration/schedulinglicensing/'
         self.consoleVerbose = 1
@@ -102,85 +72,85 @@ class odyssey():
         self.apiTechniciansAPI = '/api/technicians'
         self.apiTeamsAPI = '/api/teams'
 
-#         self.createTenantsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenants'
-#         self.apiAccountsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/accounts'
-#         self.apiAgreementsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceAgreements'
-#         self.apiServiceOfferingsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceofferings'
-#         self.apiServiceHoursURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceHours'
-#         self.apiCompanyHolidsaysURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/companyHolidays'
-#         self.apiServiceTerritoriesURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceTerritories'
-#         self.adminUsersURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/users'
-#         self.adminTenantAdministratorsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenantadministrator'
-#         self.apiTechniciansURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/technicians'
-#         self.apiTeamsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/teams'
-#         self.apiDuplicateEmailURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/duplicateemployees?email='
+        self.createTenantsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenants'
+        self.apiAccountsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/accounts'
+        self.apiAgreementsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceAgreements'
+        self.apiServiceOfferingsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceofferings'
+        self.apiServiceHoursURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceHours'
+        self.apiCompanyHolidsaysURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/companyHolidays'
+        self.apiServiceTerritoriesURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceTerritories'
+        self.adminUsersURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/users'
+        self.adminTenantAdministratorsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenantadministrator'
+        self.apiTechniciansURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/technicians'
+        self.apiTeamsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/teams'
+        self.apiDuplicateEmailURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/duplicateemployees?email='
 
     #def __connect__(self):
 
-#         try:
-#             requests.get("http://" + self.appServerName)
-#         except:
-#             print("Network Error reaching " + self.appServerName)
-#             sys.exit("Network Error reaching " + self.appServerName)
-# 
-#         response = requests.get("http://" + self.appServerName)
-#         if response.status_code > 204:
-#             print("Network Error reaching " + self.appServerName + " Status Code = " + str(response.status_code))
-#             sys.exit("Error reaching " + self.appServerName + " Status Code = " + str(response.status_code))
+        try:
+            requests.get("http://" + self.appServerName)
+        except:
+            print("Network Error reaching " + self.appServerName)
+            sys.exit("Network Error reaching " + self.appServerName)
+
+        response = requests.get("http://" + self.appServerName)
+        if response.status_code > 204:
+            print("Network Error reaching " + self.appServerName + " Status Code = " + str(response.status_code))
+            sys.exit("Error reaching " + self.appServerName + " Status Code = " + str(response.status_code))
 
 
 
-#     def validate(self):
-#         tenantSourceFile = self.filePath + 'tenants/' + self.scriptFile
-# 
-#         if os.path.exists(tenantSourceFile) == False:
-#             print('Source file (' + tenantSourceFile +  ' not found - quitting')
-#             sys.exit()
-#         else:
-#             print('Opening main test script file: ' + tenantSourceFile)
+    def validate(self):
+        tenantSourceFile = self.filePath + 'tenants/' + self.scriptFile
 
-        self.configDict = []
-        with open(self.scriptFile, mode='r') as infile:
+        if os.path.exists(tenantSourceFile) == False:
+            print('Source file (' + tenantSourceFile +  ' not found - quitting')
+            sys.exit()
+        else:
+            print('Opening main test script file: ' + tenantSourceFile)
+
+        self.scriptDict = []
+        with open(tenantSourceFile, mode='r') as infile:
             dictReader = csv.DictReader(infile)
             for row in dictReader:
-                self.configDict.append(row)
+                self.scriptDict.append(row)
 
 
-       
+
 #        csvFileValidator = csv.DictReader(open(tenantSourceFile))
 
-        for row in self.configDict:
+        for row in self.scriptDict:
             print('Validating source file...')
-            print row["voloAPIKey"]
-#             try:
-#                 companyName = str(row["companyName"])
-#                 adminName = str(row["name"])
-#                 adminEmail = str(row["emailAddress"])
-#                 licenses = int(row["licenses"])
-#                 workOrderNumberSeed = int(row["workOrderNumberSeed"])
-#                 invoiceNumberSeed = int(row["invoiceNumberSeed"])
-#                 emailDomain = str(row["Email_Domain"])
-# 
-#                 companyHoursFile = str(row["Hours"])
-#                 companyHolidaysFile = str(row["Holidays"])
-#                 companyTerritory = str(row["Territories"])
-#                 employeesList = str(row["Employees"])
-#                 servicesList = str(row["Services"])
-#                 teamsList = str(row["Teams"])
-#                 accountsList = str(row["Accounts"])
-#                 #accountswithAgreements = str(row["AccountswithAgreements"])
-#                 agreementsPerDay = int(row["AgreementsPerDay"])
-#                 agreementsDelay = int(row["AgreementDelayinSeconds"])
-#             except:
-#                 print('Source file incomplete, check all rows against format of template.csv')
-#                 sys.exit()
-# 
-#             if os.path.isfile(self.filePath + 'companyhours/' + companyHoursFile) == True:
-#                 print('Processing company hours from: ' + companyHoursFile)
-#             else:
-#                 print('Using default file! Company hours file (' + self.filePath + companyHoursFile + ') not found.')
-#                 print('')
-#                 sys.exit()
+            print row["companyName"]
+            try:
+                companyName = str(row["companyName"])
+                adminName = str(row["name"])
+                adminEmail = str(row["emailAddress"])
+                licenses = int(row["licenses"])
+                workOrderNumberSeed = int(row["workOrderNumberSeed"])
+                invoiceNumberSeed = int(row["invoiceNumberSeed"])
+                emailDomain = str(row["Email_Domain"])
+
+                companyHoursFile = str(row["Hours"])
+                companyHolidaysFile = str(row["Holidays"])
+                companyTerritory = str(row["Territories"])
+                employeesList = str(row["Employees"])
+                servicesList = str(row["Services"])
+                teamsList = str(row["Teams"])
+                accountsList = str(row["Accounts"])
+                #accountswithAgreements = str(row["AccountswithAgreements"])
+                agreementsPerDay = int(row["AgreementsPerDay"])
+                agreementsDelay = int(row["AgreementDelayinSeconds"])
+            except:
+                print('Source file incomplete, check all rows against format of template.csv')
+                sys.exit()
+
+            if os.path.isfile(self.filePath + 'companyhours/' + companyHoursFile) == True:
+                print('Processing company hours from: ' + companyHoursFile)
+            else:
+                print('Using default file! Company hours file (' + self.filePath + companyHoursFile + ') not found.')
+                print('')
+                sys.exit()
 
 
 

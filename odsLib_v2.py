@@ -25,70 +25,40 @@ import re
 #from accounts_loadtest import url
 
 class odyssey():
-    def __init__(self, env = "QA"):
-
-        self.filePath = os.getcwd() + "\\"
+    def __init__(self, env):
         
-
+       
     #read the config file and set the config variables
-
-        self.logFilePath = self.filePath
-        
-        companyName = "Gold Tenant"
-        licenses = 
-        workOrderNumberSeed = 
-        invoiceNumberSeed = 
-        emailDomain = 
-        
-        companyHoursFile = 
-        companyHolidaysFile = 
-        companyTerritory = 
-        employeesList =
-        servicesList = 
-        teamsList = 
-        accountsList = 
-        #accountswithAgreements = str(row["AccountswithAgreements"])
-        agreementsPerDay = 
-        agreementsDelay = 
-
-        #read from file
+    
+        self.filePath = '//mds-fs01/pitcrew/api_testing/'
+        self.logFilePath = '//mds-fs01/pitcrew/api_testing/logs/'
         self.appServerName = 'ngp-qa-web'
-        
-        #read from file
         self.voloAPIKey = 'ODYS-SEYO-DYSS-EYOD'
+        self.scriptFile = "eap_boston_3.csv" #hard code
         
-        #hardcode 
-        self.scriptFile = self.filePath + "environmentConfigs.csv" #hard code
-
-        #may deprecate
         self.dbServerName = 'ngp-qa-db'
         self.dbServerPort = '8080'
         self.dbServerURL = "http://" + self.dbServerName + ":" + self.dbServerPort
-       
-        #read in from the config
         self.appServerAdminPort = '86'
         self.appServerAPIPort = '85'
-        
-        #???
-        #self.logFilePathAdmin = self.filePath + "Logs/Administration/"
-        
+       
+       
+        self.logFilePathAdmin = self.filePath + "Logs/Administration/"
         self.sysAdminPassword = 'letmein123'
         self.sysAdminEmail = 'admin@marathondata.com'
-
+        
         #hard code
-        #self.sysAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAdminPort + '/administration/token'
-        #self.tenantAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAPIPort + '/api/token'
-        
-        
+        self.sysAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAdminPort + '/administration/token'
+        self.tenantAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAPIPort + '/api/token'
         self.tenantAdminPassword = "letmein123"
         self.adminSchedulingLicensingURL = 'http://' + self.appServerName + ":" + self.appServerAdminPort + '/administration/schedulinglicensing/'
         self.consoleVerbose = 1
-
-
+        
+        
         self.headers = {'content-type': 'application/json', 'Authorization' : "blankToken"}
         self.creatingTenants = True
         self.tenantUserName = ""
-
+        
         #define API endpoints
         self.createTenantsAPI = '/administration/tenants'
         self.apiAccountsAPI = '/api/accounts'
@@ -101,86 +71,85 @@ class odyssey():
         self.adminTenantAdministratorsAPI = '/administration/tenantadministrator'
         self.apiTechniciansAPI = '/api/technicians'
         self.apiTeamsAPI = '/api/teams'
-
-#         self.createTenantsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenants'
-#         self.apiAccountsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/accounts'
-#         self.apiAgreementsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceAgreements'
-#         self.apiServiceOfferingsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceofferings'
-#         self.apiServiceHoursURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceHours'
-#         self.apiCompanyHolidsaysURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/companyHolidays'
-#         self.apiServiceTerritoriesURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceTerritories'
-#         self.adminUsersURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/users'
-#         self.adminTenantAdministratorsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenantadministrator'
-#         self.apiTechniciansURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/technicians'
-#         self.apiTeamsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/teams'
-#         self.apiDuplicateEmailURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/duplicateemployees?email='
+        
+        self.createTenantsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenants'
+        self.apiAccountsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/accounts'
+        self.apiAgreementsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceAgreements'
+        self.apiServiceOfferingsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceofferings'
+        self.apiServiceHoursURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceHours'
+        self.apiCompanyHolidsaysURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/companyHolidays'
+        self.apiServiceTerritoriesURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/serviceTerritories'
+        self.adminUsersURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/users'
+        self.adminTenantAdministratorsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenantadministrator'
+        self.apiTechniciansURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/technicians'
+        self.apiTeamsURL = 'http://' + self.appServerName + ':' + self.appServerAPIPort + '/api/teams'
 
     #def __connect__(self):
+        
+        try:
+            requests.get("http://" + self.appServerName)
+        except:
+            print("Network Error reaching " + self.appServerName)
+            sys.exit("Network Error reaching " + self.appServerName)
+            
+        response = requests.get("http://" + self.appServerName)
+        if response.status_code > 204:
+            print("Network Error reaching " + self.appServerName + " Status Code = " + str(response.status_code))
+            sys.exit("Error reaching " + self.appServerName + " Status Code = " + str(response.status_code))
 
-#         try:
-#             requests.get("http://" + self.appServerName)
-#         except:
-#             print("Network Error reaching " + self.appServerName)
-#             sys.exit("Network Error reaching " + self.appServerName)
-# 
-#         response = requests.get("http://" + self.appServerName)
-#         if response.status_code > 204:
-#             print("Network Error reaching " + self.appServerName + " Status Code = " + str(response.status_code))
-#             sys.exit("Error reaching " + self.appServerName + " Status Code = " + str(response.status_code))
 
 
+    def validate(self):
+        tenantSourceFile = self.filePath + 'tenants/' + self.scriptFile
 
-#     def validate(self):
-#         tenantSourceFile = self.filePath + 'tenants/' + self.scriptFile
-# 
-#         if os.path.exists(tenantSourceFile) == False:
-#             print('Source file (' + tenantSourceFile +  ' not found - quitting')
-#             sys.exit()
-#         else:
-#             print('Opening main test script file: ' + tenantSourceFile)
+        if os.path.exists(tenantSourceFile) == False:
+            print('Source file (' + tenantSourceFile +  ' not found - quitting')
+            sys.exit()
+        else:
+            print('Opening main test script file: ' + tenantSourceFile)
 
-        self.configDict = []
-        with open(self.scriptFile, mode='r') as infile:
+        self.scriptDict = []
+        with open(tenantSourceFile, mode='r') as infile:
             dictReader = csv.DictReader(infile)
             for row in dictReader:
-                self.configDict.append(row)
-
-
+                self.scriptDict.append(row)
        
+    
+          
 #        csvFileValidator = csv.DictReader(open(tenantSourceFile))
 
-        for row in self.configDict:
+        for row in self.scriptDict:
             print('Validating source file...')
-            print row["voloAPIKey"]
-#             try:
-#                 companyName = str(row["companyName"])
-#                 adminName = str(row["name"])
-#                 adminEmail = str(row["emailAddress"])
-#                 licenses = int(row["licenses"])
-#                 workOrderNumberSeed = int(row["workOrderNumberSeed"])
-#                 invoiceNumberSeed = int(row["invoiceNumberSeed"])
-#                 emailDomain = str(row["Email_Domain"])
-# 
-#                 companyHoursFile = str(row["Hours"])
-#                 companyHolidaysFile = str(row["Holidays"])
-#                 companyTerritory = str(row["Territories"])
-#                 employeesList = str(row["Employees"])
-#                 servicesList = str(row["Services"])
-#                 teamsList = str(row["Teams"])
-#                 accountsList = str(row["Accounts"])
-#                 #accountswithAgreements = str(row["AccountswithAgreements"])
-#                 agreementsPerDay = int(row["AgreementsPerDay"])
-#                 agreementsDelay = int(row["AgreementDelayinSeconds"])
-#             except:
-#                 print('Source file incomplete, check all rows against format of template.csv')
-#                 sys.exit()
-# 
-#             if os.path.isfile(self.filePath + 'companyhours/' + companyHoursFile) == True:
-#                 print('Processing company hours from: ' + companyHoursFile)
-#             else:
-#                 print('Using default file! Company hours file (' + self.filePath + companyHoursFile + ') not found.')
-#                 print('')
-#                 sys.exit()
+            print row["companyName"]
+            try:
+                companyName = str(row["companyName"])
+                adminName = str(row["name"])
+                adminEmail = str(row["emailAddress"])
+                licenses = int(row["licenses"])
+                workOrderNumberSeed = int(row["workOrderNumberSeed"])
+                invoiceNumberSeed = int(row["invoiceNumberSeed"])
+                emailDomain = str(row["Email_Domain"])
+
+                companyHoursFile = str(row["Hours"])
+                companyHolidaysFile = str(row["Holidays"])
+                companyTerritory = str(row["Territories"])
+                employeesList = str(row["Employees"])
+                servicesList = str(row["Services"])
+                teamsList = str(row["Teams"])
+                accountsList = str(row["Accounts"])
+                #accountswithAgreements = str(row["AccountswithAgreements"])
+                agreementsPerDay = int(row["AgreementsPerDay"])
+                agreementsDelay = int(row["AgreementDelayinSeconds"])
+            except:
+                print('Source file incomplete, check all rows against format of template.csv')
+                sys.exit()
+
+            if os.path.isfile(self.filePath + 'companyhours/' + companyHoursFile) == True:
+                print('Processing company hours from: ' + companyHoursFile)
+            else:
+                print('Using default file! Company hours file (' + self.filePath + companyHoursFile + ') not found.')
+                print('')
+                sys.exit()
 
 
 
@@ -203,19 +172,19 @@ class odyssey():
                 print('Processing employees from: ' + employeesList)
             else:
                 print('Using default file! Company employees file (' + self.filePath + employeesList + ') not found.')
-
+                
 
             if os.path.isfile(self.filePath + 'services/' + servicesList) == True:
                 print('Processing services from: '  + servicesList)
             else:
                 print('Using default file! Company services file (' + self.filePath + servicesList + ') not found.')
-
+                
 
             if os.path.isfile(self.filePath + 'teams/' + teamsList) == True:
                 print('Processing teams from: '  + teamsList)
             else:
                 print('Using default file! Company teams file (' + self.filePath + teamsList + ') not found.')
-
+               
 
             if accountsList == 'None' or accountsList == '':
                 print('No accounts-only file to import, step will be skipped')
@@ -224,7 +193,7 @@ class odyssey():
                     print('Processing accounts list from: '  + accountsList)
                 else:
                     print('Accounts file (' + self.filePath + accountsList + ') not found.')
-
+                    
 
             if agreementsPerDay == '0':
                 print('No accounts with agreements file to import, step will be skipped')
@@ -240,13 +209,13 @@ class odyssey():
 
     def createOneTenant(self):
         pass
-
+    
     def createTenants(self, createAll = True, finish = True, createAccounts = True, overWrite = True):
         #createAll will create all tenants in the input file - False will create 1 tenant
         #finish will set up holidays, hours, etc - False will not
         #createAccounts will create the accounts in the csv - False will not
         #overWrite will overWrite existing tenants - False will create a new tenant admin email to create a new tenant
-
+        
         tenantSourceFile = self.filePath + 'tenants/' + self.scriptFile
 
         if os.path.exists(tenantSourceFile) == False:
@@ -281,13 +250,13 @@ class odyssey():
             #__odysseyAdminSession__ = __odysseyAdmin__()
             #__odysseyAdminSession__.setAdminEnvironmentURLs('QA')
             tenant = self.createTenant(tenantAdminName, companyName, tenantAdminEmail, 5, 1000, 1000)
-
+            
             #__finishTenant__ = odysseyAccounts()
            # __finishTenant__.setEnvironmentURLs("QA")
 #             while len(str(__getToken__(self.tenantAdminURL, tenantAdminEmail, self.tenantAdminPassword))) <= 100:
 #                 print ('Unable to authenticate user, waiting 5 seconds...')
             time.sleep(5)
-
+            
             # Allow this to be none
             self.creatingTenants = False
             if finish:
@@ -297,7 +266,7 @@ class odyssey():
                 #self.populateEmployees(employeesList)
                 self.populateServices(servicesList)
                 self.populateTeams(teamsList)
-
+            
             if createAccounts:
                 if accountsList == 'None' or accountsList == '':
                     print ('No accounts-only file to import, step will be skipped')
@@ -308,18 +277,18 @@ class odyssey():
 #                 print ('No accounts with agreements file to import, step will be skipped')
 #             else:
 #                 self.createAgreements('KearnyJerseyCity.csv', agreementsPerDay, agreementsDelay, True)
-#
+# 
 #             #finish tenant creation
 #             #setAdminAndTenantID(tenantAdminEmail)
             #emailDomain = emailDomain
-
-
+            
+    
             if i==1 and createAll == False:
                 break
+            
 
-
-
-
+    
+    
 #class __odysseyAdminSession__():
 #     Username = self.adminUserName
 #     Password = 'letmein123'
@@ -353,28 +322,28 @@ class odyssey():
             'invoiceNumberSeed': invoiceNumberSeed, \
             }
 
-
+    
         self.tenantAdminEmail = tenantAdminEmail
         createTenantsURL = 'http://' + self.appServerName + ':' + self.appServerAdminPort + '/administration/tenants'
         tenantPayload = json.dumps(post_body_tenant)
         tenantResults = {}
         tenantResults = self.__postAPI__(self.createTenantsURL, tenantPayload, logFileName)
-
-
-
+        
+        
+        
         if tenantResults["statusCode"] == 200:
 
             pass
-
+        
         elif tenantResults["statusCode"] == 409:
             self.getDBID()
             if self.consoleVerbose >= 1: print("Tenant already exists with tenantID: " + self.tenantID)
-
+        
         else:
             print("Error: " + tenantResults["content"])
             return()
-
-
+    
+    
         post_body_scheduling = { \
         'id': '00000000-0000-0000-0000-000000000000', \
         'voloAPIKey': self.voloAPIKey, \
@@ -383,7 +352,7 @@ class odyssey():
         schedulingPayload = json.dumps(post_body_scheduling)
         schedulingLicensingFullURL = self.adminSchedulingLicensingURL + str(tenantResults["id"])
         SchedulingConfigResults = self.__postAPI__(schedulingLicensingFullURL, schedulingPayload, logFileName)
-
+    
     def __createAdminLogFileName__(self):
         i = datetime.datetime.now()
         dt = i.strftime('%Y%m%d-%H%M%S')
@@ -392,11 +361,11 @@ class odyssey():
 
         return fullLogFileName
 
-
-
+ 
+    
 
     def __postAPI__(self, url, payload, logFileName):
-
+        
         results = {}
         output = requests.post(url, payload, headers=self.headers)
         (str(output.status_code))
@@ -406,16 +375,16 @@ class odyssey():
             if self.consoleVerbose >= 1: print("got a new token: " + token)
             self.headers = {'content-type': 'application/json', 'Authorization' : token}
             output = requests.post(url, payload, headers=self.headers)
-
+            
         if output.status_code == 200:
             jsonResponse = output.json()
             results["id"] = jsonResponse["id"].encode("ascii")
         else:
             results["id"] = ""
-
+            
         results["content"] = output.content
         results["statusCode"] = output.status_code
-
+        
         log_output = url + "\t" + str(output.status_code) +  "\t" + str(output.elapsed) + "\t" + str(payload) + "\t" + results["id"]  + '\n'
         try:
             logFile = open(logFileName, 'a')
@@ -428,9 +397,9 @@ class odyssey():
         if self.consoleVerbose >= 2: print('Logging API post: ' + log_output)
 
         return(results);
-
+    
     def __getAPI__(self, url, params):
-
+        
         results = {}
         output = requests.get(url, params=params, headers=self.headers)
         if output.status_code == 401 or output.status_code == 500:
@@ -440,20 +409,20 @@ class odyssey():
             self.headers = {'content-type': 'application/json', 'Authorization' : token}
             output = requests.get(url, params=params, headers=self.headers)
             #print(str(output.status_code))
-
+            
         if output.status_code == 200:
             jsonResponse = output.json()
             try:
                 results["id"] = jsonResponse["id"].encode("ascii")
             except:
                 results["id"] = ""
-
+            
         results["content"] = output.content
         results["statusCode"] = output.status_code
         return(results)
-
+    
     def getAccounts(self):
-
+        
         results = {}
         params = ''
         output = requests.get(self.apiAccountsURL , params=params, headers=self.headers)
@@ -465,15 +434,15 @@ class odyssey():
             self.headers = {'content-type': 'application/json', 'Authorization' : token}
             output = requests.get(self.apiAccountsURL, params=params, headers=self.headers)
             print(str(output.status_code))
-
+            
         if output.status_code == 200:
             jsonResponse = output.json()
             self.accountList =  jsonResponse
         else:
             self.accountList =  ""
-
-
-
+            
+        
+   
 
     def __setAdminAndTenantID__(self, email):
         postHeaders = {}
@@ -512,9 +481,9 @@ class odyssey():
             authURL = self.tenantAdminTokenURL
             scope = "&scope=marathon_odyssey"
             password = self.tenantAdminPassword
-
+    
         postPayload = "grant_type=password&username=" + userName + "&password=" + password + scope
-
+            
         response = requests.post(authURL, postPayload, headers=self.headers)
         try:
             accessToken = str(response.json()["access_token"])
@@ -533,9 +502,9 @@ class odyssey():
         companyHoursSourceFile = self.filePath + 'CompanyHours/' + companyHoursInJSON
         jsonCompanyHours = open(companyHoursSourceFile, 'rb')
         payloadCompanyHours = jsonCompanyHours.read()
-
+        
         companyHoursResults = self.__postAPI__(self.apiServiceHoursURL, payloadCompanyHours, logFileName);
-
+  
 
 
     def setCompanyHolidays(self, companyHolidsaysInJSON):
@@ -588,8 +557,8 @@ class odyssey():
 
             serviceResults = self.__postAPI__(self.apiServiceOfferingsURL, servicePayload, logFileName);
 
-
-
+    
+    
 
     def populateEmployees(self, csvFile):
         if self.consoleVerbose >= 1: print("Setup the Employees")
@@ -817,10 +786,10 @@ class odyssey():
             initialCommitmentWindowEnd_iso = ''
             countOfAgreements = 0
             logFileName = self.__createLogFileName__('CreateAccountsWithAgreements')
-
+    
             requestServices = requests.get(self.apiServiceOfferingsURL, headers=self.headers)
             services = requestServices.json()
-
+            
             #get accounts list from the api
             accounts = self.getAccounts()
             #from account in accounts
@@ -828,7 +797,7 @@ class odyssey():
                 #get addressID
                 #get contactID
                 #get contact Name
-
+            
             for account in accounts:
         #             post_body_account = { \
         #                 'address': { \
@@ -847,15 +816,15 @@ class odyssey():
         #                 'isNew': True, \
         #                 'name': str(row["Company Name"])\
         #             }
-        #
+        # 
         #             accountPayload = json.dumps(post_body_account)
         #             accountResults = self.__postAPI__(self.apiAccountsURL, accountPayload, logFileName)
-
+    
                 initialCommitmentWindowStart_iso = initialCommitmentWindowStart.strftime("%Y-%m-%dT00:15:00")
                 initialCommitmentWindowEnd_iso = initialCommitmentWindowEnd.strftime("%Y-%m-%dT23:45:00")
-
+    
                 todayDateFormatted = today_date.strftime("%Y-%m-%d")
-
+    
                 post_body_agreement = {
                     "accountId" : str(accountResults['id']), \
                         "billingAddress" : { 'city': str(row["City"]), \
@@ -918,25 +887,25 @@ class odyssey():
                           "txbService" : "L"\
                         }\
                     }
-
+    
                 agreementPayload = json.dumps(post_body_agreement)
                 agreementResults = self.__postAPI__(self.apiAgreementsURL, agreementPayload, logFileName)
-
-
+    
+    
                 countOfAgreements += 1
-
+    
                 if countOfAgreements >= agreementsPerDay:
                     print ("Advancing Day")
                     countOfAgreements = 0
                     initialCommitmentWindowStart = initialCommitmentWindowStart + datetime.timedelta(days=1)
                     initialCommitmentWindowEnd = initialCommitmentWindowEnd + datetime.timedelta(days=1)
                 time.sleep(delayBetweenAccountCreationinSeconds)
-
+    
                 if AssertAgreements == True:
                     self.logAgreementAssertion(self.tenantID, str(accountResults['id']), str(row["Company Name"]), str(initialCommitmentWindowStart.strftime("%Y-%m-%d")), self.dbServer, self.appServerName)
-
+    
                 if self.consoleVerbose  >= 1: print('Count Of Agreements: ' + str(countOfAgreements) + '\n')
-
+                
 
     def __createAccounts__(self, csvFile):
         accountSourceFile = self.filePath + 'Accounts/' + csvFile
@@ -966,7 +935,7 @@ class odyssey():
 
             accountResults = self.__postAPI__(self.apiAccountsURL, accountPayload, logFileName)
 
-
+                
     pass
 
     def logAgreementAssertion(self, tenant, accountId, accountName, serviceDate, dbServer, apiServer):
@@ -992,13 +961,13 @@ class odyssey():
 #     newTenantGenerator.validateTenantsImportFile('tim.csv')
 #     newTenantGenerator.importTenantsFromCSV('tim.csv')
 #     pass
-#
+# 
 # if __name__ == '__main__':
 #     main()
 
     def getDBID(self):
 
-
+        
         response = requests.get(self.dbServerURL)
         if response.status_code > 204:
             print("Network Error reaching " + self.dbServerURL + " Status Code = " + str(response.status_code))
@@ -1011,23 +980,23 @@ class odyssey():
         response = requests.get(url, params = params)
         self.results = response.json()
         self.tenantID = str(self.results["Results"][0]["Claims"][0]["ClaimValue"])
-
+        
     def processHarFile(self):
-
+        
         #set creating tenants to false
-
+        
         #get the list of files in filepath
         listofFiles = os.listdir(self.filePath)
-
+        
         for fname in listofFiles:
             pathParts = os.path.splitext(fname)
             ext = pathParts[1]
             rep_file = pathParts[0]
             if ext == '.har':
-
-
+                
+            
                 # open the extract file for p:rocessing
-                #inputFile = open(self.filePath + fname, 'r')
+                inputFile = open(self.filePath + fname, 'r')
                 har = json.loads(open(self.filePath + fname).read())
                 outputFilename = self.filePath + fname + "_results.txt" #add date code to this file
                 outputFile = open(outputFilename, 'w')
@@ -1047,57 +1016,16 @@ class odyssey():
                             print(re.sub('.{8}-.{4}-.{4}-.{4}-.{12}', "0000-0000-0000", results["content"]))
                             
                         
-
                         #write the results to the file
-
+                        
                         # = line + '\n'
                         #outputFile.write(output)
                 #sys.stdout.write(fname)
-
-
-
+                            
+            
+        
                 #close the input and output files
-                
+                inputFile.close()   
                 outputFile.close()
-
-
-
-    def getOdysseyAdminAuthToken(self, email, password):
-        postHeaders = {}
-        postPayload = "grant_type=password&username=" + email + "&password=" + password + "&scope=marathon_admin"
-        response = requests.post(self.sysAdminTokenURL, postPayload, headers=postHeaders)
-        try:
-            accessToken = str(response.json()["access_token"])
-        except:
-            accessToken = ""
-        fullAccessToken = "Bearer " + accessToken
-
-        return(fullAccessToken);
-
-
-##        headers = {'content-type': 'application/json', 'Authorization' : (odysseyTenant.getAuthorizationToken(self, self.AdminEmail))}
-##            logFileName = self.createLogFileName('CreateAccountsWithAgreements')
-##
-##            initialCommitmentWindowStart = initialCommitmentWindowStart + datetime.timedelta(days=1)
-##            initialCommitmentWindowEnd = initialCommitmentWindowEnd + datetime.timedelta(days=1)
-##
-##            requestServices = requests.get(self.apiServiceOfferingsURL, headers=headers)
-
-
-    def checkForEmailInSystem(self, email):
-        isDuplicated = True
-        #adminToken = getOdysseyAdminAuthToken(self.sysAdminEmail, self.sysAdminPassword)
-
-        try:
-            ravenDBResult = str(self.results["Results"][0]["UserName"]).lower()
-        except:
-            ravenDBResult = False
-
-        if ravenDBResult == email.lower():
-            print ('A user with the email ' + email + ' already exists in the Odyssey system. \n')
-            isDuplicated = True
-        else:
-            print('Email address is unique')
-            isDuplicated = False
-        return isDuplicated
-
+        
+        
