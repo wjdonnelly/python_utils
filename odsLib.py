@@ -997,7 +997,7 @@ class odyssey():
 
 
                 # open the extract file for p:rocessing
-                inputFile = open(self.filePath + fname, 'r')
+                #inputFile = open(self.filePath + fname, 'r')
                 har = json.loads(open(self.filePath + fname).read())
                 outputFilename = self.filePath + fname + "_results.txt" #add date code to this file
                 outputFile = open(outputFilename, 'w')
