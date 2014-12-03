@@ -20,32 +20,40 @@ import dateutil.parser
 import math
 from collections import Counter
 from bdb import Breakpoint
+import re
 
 #from accounts_loadtest import url
 
 class odyssey():
-    def __init__(self):
+    def __init__(self, env):
+        
        
     #read the config file and set the config variables
     
         self.filePath = '//mds-fs01/pitcrew/api_testing/'
         self.logFilePath = '//mds-fs01/pitcrew/api_testing/logs/'
         self.appServerName = 'ngp-qa-web'
+        self.voloAPIKey = 'ODYS-SEYO-DYSS-EYOD'
+        self.scriptFile = "eap_boston_3.csv" #hard code
+        
         self.dbServerName = 'ngp-qa-db'
         self.dbServerPort = '8080'
         self.dbServerURL = "http://" + self.dbServerName + ":" + self.dbServerPort
         self.appServerAdminPort = '86'
         self.appServerAPIPort = '85'
-        self.voloAPIKey = 'ODYS-SEYO-DYSS-EYOD'
-        self.scriptFile = "eap_boston_3.csv"
+       
+       
         self.logFilePathAdmin = self.filePath + "Logs/Administration/"
         self.sysAdminPassword = 'letmein123'
         self.sysAdminEmail = 'admin@marathondata.com'
+        
+        #hard code
         self.sysAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAdminPort + '/administration/token'
         self.tenantAdminTokenURL = 'http://' + self.appServerName + ":" + self.appServerAPIPort + '/api/token'
         self.tenantAdminPassword = "letmein123"
         self.adminSchedulingLicensingURL = 'http://' + self.appServerName + ":" + self.appServerAdminPort + '/administration/schedulinglicensing/'
         self.consoleVerbose = 1
+        
         
         self.headers = {'content-type': 'application/json', 'Authorization' : "blankToken"}
         self.creatingTenants = True
@@ -100,15 +108,19 @@ class odyssey():
         else:
             print('Opening main test script file: ' + tenantSourceFile)
 
+        self.scriptDict = []
         with open(tenantSourceFile, mode='r') as infile:
-            reader = csv.reader(infile)
-            self.scriptDict = {rows[0]:rows[1] for rows in reader}
-            stop()
-                    
-        #csvFileValidator = csv.DictReader(open(tenantSourceFile))
+            dictReader = csv.DictReader(infile)
+            for row in dictReader:
+                self.scriptDict.append(row)
+       
+    
+          
+#        csvFileValidator = csv.DictReader(open(tenantSourceFile))
 
-        for row in csvFileValidator:
+        for row in self.scriptDict:
             print('Validating source file...')
+            print row["companyName"]
             try:
                 companyName = str(row["companyName"])
                 adminName = str(row["name"])
@@ -160,22 +172,19 @@ class odyssey():
                 print('Processing employees from: ' + employeesList)
             else:
                 print('Using default file! Company employees file (' + self.filePath + employeesList + ') not found.')
-                print('Quitting script')
-                sys.exit()
+                
 
             if os.path.isfile(self.filePath + 'services/' + servicesList) == True:
                 print('Processing services from: '  + servicesList)
             else:
                 print('Using default file! Company services file (' + self.filePath + servicesList + ') not found.')
-                print('Quitting script')
-                sys.exit()
+                
 
             if os.path.isfile(self.filePath + 'teams/' + teamsList) == True:
                 print('Processing teams from: '  + teamsList)
             else:
                 print('Using default file! Company teams file (' + self.filePath + teamsList + ') not found.')
-                print('Quitting script')
-                sys.exit()
+               
 
             if accountsList == 'None' or accountsList == '':
                 print('No accounts-only file to import, step will be skipped')
@@ -184,8 +193,7 @@ class odyssey():
                     print('Processing accounts list from: '  + accountsList)
                 else:
                     print('Accounts file (' + self.filePath + accountsList + ') not found.')
-                    print('Quitting script')
-                    sys.exit()
+                    
 
             if agreementsPerDay == '0':
                 print('No accounts with agreements file to import, step will be skipped')
@@ -400,17 +408,19 @@ class odyssey():
             if self.consoleVerbose >= 1: print("got a new token: " + token)
             self.headers = {'content-type': 'application/json', 'Authorization' : token}
             output = requests.get(url, params=params, headers=self.headers)
-            print(str(output.status_code))
+            #print(str(output.status_code))
             
         if output.status_code == 200:
             jsonResponse = output.json()
-            results["id"] = jsonResponse["id"].encode("ascii")
-        else:
-            results["id"] = ""
+            try:
+                results["id"] = jsonResponse["id"].encode("ascii")
+            except:
+                results["id"] = ""
             
         results["content"] = output.content
         results["statusCode"] = output.status_code
-
+        return(results)
+    
     def getAccounts(self):
         
         results = {}
@@ -509,7 +519,7 @@ class odyssey():
 
 
     def setCompanyTerritory(self, companyTerritoryInJSON):
-        if self.consoleVerbose >= 1: print("Setup the Services")
+        if self.consoleVerbose >= 1: print("Setup the Territory")
         logFileName = self.__createLogFileName__('setTerritory')
         territorySourceFile = self.filePath + 'Territories/' + companyTerritoryInJSON
         jsonTerritory = open(territorySourceFile, 'rb')
@@ -971,4 +981,51 @@ class odyssey():
         self.results = response.json()
         self.tenantID = str(self.results["Results"][0]["Claims"][0]["ClaimValue"])
         
-   
+    def processHarFile(self):
+        
+        #set creating tenants to false
+        
+        #get the list of files in filepath
+        listofFiles = os.listdir(self.filePath)
+        
+        for fname in listofFiles:
+            pathParts = os.path.splitext(fname)
+            ext = pathParts[1]
+            rep_file = pathParts[0]
+            if ext == '.har':
+                
+            
+                # open the extract file for p:rocessing
+                inputFile = open(self.filePath + fname, 'r')
+                har = json.loads(open(self.filePath + fname).read())
+                outputFilename = self.filePath + fname + "_results.txt" #add date code to this file
+                outputFile = open(outputFilename, 'w')
+                #sys.stdout.write(fname + '\n')
+                for i in range(len(har["log"]["entries"])):
+                    if har["log"]["entries"][i]["request"]["method"] == "GET":
+                        line = har["log"]["entries"][i]["request"]["url"]
+                        if "http://" + self.appServerName + ":" + self.appServerAPIPort in line:
+                        #check if the line is a valid execution
+                            #line = line.split()[1]
+                            line = line.strip('\"')
+                            apiCall = line.strip('\,\"')
+                            print(apiCall)
+                            params = {}
+                            results = self.__getAPI__(apiCall, params)
+                            print(results["statusCode"])
+                            print(re.sub("results["content"])
+                            
+                            re.sub('[0-9]{4}\.[0-9]{4}\.[0-9]{4}', 'xxx', guid)
+                        #write the results to the file
+                        
+                        # = line + '\n'
+                        #outputFile.write(output)
+                #sys.stdout.write(fname)
+                            
+            
+        
+                #close the input and output files
+                inputFile.close()   
+                outputFile.close()
+        
+        
